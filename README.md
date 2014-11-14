@@ -24,13 +24,17 @@
 	shoot me an email!
 
 @origin 
+
 	http://elocade.com/games/elotap/
 
 @author
+
 	Numaer Zaker
 
 @date
+
 	11/13/14
 
 @email 
+
 	znzaker@gmail.com
