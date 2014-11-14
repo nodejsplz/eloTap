@@ -1,4 +1,5 @@
 @General Description
+
 	This is a Javascript and HTML5 canvas game that
 	tests the a player's reaction. When the square
 	turns green, the user should click as fast as 
@@ -6,8 +7,9 @@
 	and averaged.
 
 @Developer Description
+
 	**This code is meant to help beginners.
-	**I advise you to check out elocade.com
+	**I advise you to check out http://elocade.com
 
 	The program was documented and organized so that 
 	learning and manipulating it is easy for anyone. 
