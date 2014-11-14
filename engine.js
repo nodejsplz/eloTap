@@ -4,14 +4,8 @@ var ctx = canvas.getContext("2d");
 
 //Initialize canvas dimensions
 canvas.height = window.innerHeight-200;
-if (canvas.height > 391)
-	canvas.height = 391;
 canvas.width = canvas.height*2/3;
 //
-
-var scaleHeight = canvas.height/391;
-var scaleWidth = canvas.width/260;
-
 
 
 window.onload=function(){
@@ -25,72 +19,68 @@ var inStart = false;
 
 var sum = 0.;
 var average = 0;
-var playCount = document.getElementById('plays-tf').value;
-var myElo=document.getElementById('elo-tf').value;
-var enemyScore=document.getElementById('beat-tf').value;
-var enemyName=document.getElementById('enemy-tf').value;
-var lastScore=document.getElementById('last-tf').value;
-var inRank = false;
+var playCount = 0; 
 
 var start;
 var end;
 var timeTake;
 
-if (document.getElementById('rank-tf').value == 1)
-    inRank = true;
-
-if (document.getElementById('pigs').value != ''){
-    document.getElementById('pointIG').innerHTML = "PIG: " + document.getElementById('pigs').value;
-    document.getElementById('uName').innerHTML = document.getElementById('name').value;
-}
-
 
 var colorMascot = "rgb(250, 218, 114)";
 var mascot;
 
-if (inRank)
-	document.getElementById('hello').innerHTML = "Last Reaction: " + lastScore + " ms<br>Rating: " + myElo +"<br>Beat <span style='color:blue'>"+ enemyName + "</span>'s reaction of <span style='color:green'>" + enemyScore + "</span> ms";
-else
-	document.getElementById('hello').innerHTML = "Last Reaction: " + lastScore + " ms"
-ctx.font= 30*scaleWidth +"px garamond";
+ctx.font= 30 +"px garamond";
 //Main game function (reloading through threads)
 canvas.style.background = 'rgba(140, 114, 191,.5)';
 mascot = new boxObject();
 
 	function update(){
 		
-		ctx.clearRect(0,0,canvas.width, canvas.height);
+		
 		counter++;
-		mascot.draw();
-		ctx.fillText(status, 20*scaleWidth, canvas.height/5);
+		
+		console.log(counter)
+
+		// // 10 ms
+		
 		//Set probability
-		if (counter%50 == 0 && !inResponse && counter > 100 && !clicked){ // every .5 seconds
+		if (counter%50 == 0 && !inResponse && counter > 100){ // every .5 seconds
 				if (Math.random() < Math.random()){
 					colorMascot = 'rgb(50, 200, 100)';
 					status = "Click now!"
 					inResponse = true;
+					ctx.clearRect(0,0,canvas.width, canvas.height);
+					mascot.draw();
 					start = Date.now();
+					return;
 				}
 		}
+		if (!inResponse && clicked){
+			clicked = false;
+			return;
+		}else{
+			setTimeout(update, 10);	
+		}
+		
+		
 
-
-		setTimeout(update, 10); // 10 ms
+		
 	}
 
 	function boxObject(){
     this.x = canvas.width / 2;
     this.y = canvas.height / 2;
-   	this.radius = 70 * scaleWidth;
-	this.eyeRadius = 10 * scaleWidth;
-	this.eyeXOffset = 30 * scaleWidth;
-	this.eyeYOffset = 10 * scaleHeight;
+   	this.radius = 70 ;
+	this.eyeRadius = 10 ;
+	this.eyeXOffset = 30 ;
+	this.eyeYOffset = 10 ;
 	this.eyeX = this.x - this.eyeXOffset;
 	this.eyeY = this.y - this.eyeYOffset;
 	this.eyeX2 = this.x + this.eyeXOffset;
 
     this.draw = function(){
 	      ctx.beginPath();
-		  ctx.rect(this.x-60*scaleWidth, this.y-50*scaleHeight, 120 * scaleWidth, 100 * scaleHeight);
+		  ctx.rect(this.x-60, this.y-50, 120 , 100 );
 		  ctx.fillStyle = colorMascot;
 		  ctx.fill();
 		  ctx.lineWidth = 5;
@@ -113,9 +103,9 @@ mascot = new boxObject();
 		  ctx.closePath();
 		  ctx.beginPath();
 		  if (inResponse)
-		  	ctx.arc(this.x, this.y+10 * scaleHeight, 15 * scaleHeight, 0, Math.PI, false);
+		  	ctx.arc(this.x, this.y+10 , 15 , 0, Math.PI, false);
 		  else{
-		  	ctx.arc(this.x, this.y+10 * scaleHeight, this.eyeRadius, 0, 2 * Math.PI, false);
+		  	ctx.arc(this.x, this.y+10 , this.eyeRadius, 0, 2 * Math.PI, false);
 		  	ctx.strokeStyle = 'black';
 		  }
 		  ctx.stroke();
@@ -123,46 +113,52 @@ mascot = new boxObject();
     }
 }
 
-function stashIt(){
-    if (playCount != '-1'){
-        document.getElementById('sTime-tf').value = timeTake
-        if (inRank)
-            document.getElementById('rank-tf').value = '1';
-        document.getElementById("PushScore").submit();
-    }
-    else
-        window.location.href = '/games/eloTap';
-    
-}
 	function checkClick(){
 		if (inResponse){
+			playCount++
 			end = Date.now();
-			status = "Wait for it..";
-			inResponse = false;
+
+    		colorMascot = 'rgb(114, 182, 191)'
 			timeTake = end - start;
-			stashIt();
-			//colorMascot = 'rgb(250, 218, 114)';
-			//document.getElementById('hello').innerHTML = "Your reaction time was: " + timeTake + "<br>Average: " + (parseFloat(average).toFixed(2)) + "<br> Playcount: " + playCount;
-		}
-		else{
-			status = "Clicked too fast!";
-			colorMascot = 'rgb(210, 114, 128)';
-			setTimeout(function () {window.location.reload();}, 250);
-			counter = 0;
+			sum += timeTake;
+			average = sum/playCount;
+			document.getElementById('hello').innerHTML = "Your reaction time was: " + timeTake + "<br>Average: " + (parseFloat(average).toFixed(2)) + "<br> Playcount: " + playCount;
 			inResponse = false;
 			clicked = false;
+			inStart = false;
+			counter = 0;
+			status = "Tap to go again";
+			ctx.clearRect(0,0,canvas.width, canvas.height);
+			ctx.fillText(status, 20, canvas.height/5);
+			mascot.draw();
+			
+		} 
+		else if (!inResponse){
+			inStart = false;
+
+			counter = 0;
+			status = "Too fast! Tap to restart";
+			colorMascot = 'rgb(210, 114, 128)';
+			ctx.clearRect(0,0,canvas.width, canvas.height);
+			ctx.fillText(status, 20, canvas.height/5);
+			mascot.draw();
 		}
 	}
 
 
 
-	ctx.fillText(status, 20*scaleWidth, canvas.height/2);
+	ctx.fillText(status, 20, canvas.height/2);
 
 	canvas.addEventListener("mousedown", function (e) {
     	if (!inStart){
     		inStart = true;
+			inResponse = false;
     		status = "Wait for it..";
     		update();
+    		ctx.clearRect(0,0,canvas.width, canvas.height);
+    		ctx.fillText(status, 20, canvas.height/5);
+    		colorMascot = "rgb(250, 218, 114)";
+    		mascot.draw();
     		return;
     	}
     	if (!clicked){
