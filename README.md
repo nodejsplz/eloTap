@@ -5,7 +5,7 @@
 	turns green, the user should click as fast as 
 	they can. Their reaction time is calculated
 	and averaged.
-
+ 
 @Developer Description
 
 	**This code is meant to help beginners.
