@@ -1,5 +1,5 @@
 @General Description    
-                       
+                        
 	This is a Javascript and HTML5 canvas game that
 	tests the a player's reaction. When the square
 	turns green, the user should click as fast as 
